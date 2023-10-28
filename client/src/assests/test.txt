@@ -1,0 +1,138 @@
+import React, {
+  useState,
+  useRef,
+  StrictMode
+} from "https://esm.sh/react@18.2.0";
+import ReactDOM, { createRoot } from "https://esm.sh/react-dom@18.2.0";
+import { v4 as uuidv4 } from "https://cdn.skypack.dev/uuid@9.0.0";
+import { CSSTransition } from "https://cdn.skypack.dev/react-transition-group@4.4.5";
+
+const ModalContent1 = () => {
+  return (
+    <>
+      <h1>Modal h1</h1>
+      <p>A modal for React with animations.</p>
+      <h2>Modal h2</h2>
+      <img
+        alt="pic"
+        src="https://fastly.picsum.photos/id/178/300/300.jpg?hmac=Y-OfZhLc0zTN25qZqEcwTHf81TxzHtxDTxVPWftkq7o"
+      />
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac magna
+        tortor. Aliquam eu ipsum sit amet elit mollis commodo sed id quam. Sed
+        eleifend, ipsum vitae feugiat mollis, lectus turpis bibendum ante, sed
+        tincidunt nulla lacus non mauris. Aliquam eget risus tincidunt,
+        convallis velit vel, ullamcorper nibh. Integer efficitur sodales urna a
+        gravida. Morbi sagittis ex eget lorem molestie tincidunt.
+      </p>
+    </>
+  );
+};
+
+const ModalContent2 = () => {
+  return (
+    <p>
+      The content of the modal could be placed in a components folder and then
+      passed as a prop to the Card by asigning it to modalContent. The Card
+      component itself could also be placed in the compoenents folder.
+    </p>
+  );
+};
+
+const Card = (props) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openModal = () => {
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  const clickOutside = (e) => {
+    if (e.target.id === "modal") {
+      closeModal();
+    }
+  };
+
+  // useRef for CSSTransitions
+  const nodeRef = useRef(null);
+
+  return (
+    <>
+      <div
+        className="portfolio-cards--card"
+        style={{ backgroundImage: `url(${props.imgUrl})` }}
+      >
+        <div className="portfolio-cards--card-overlay"></div>
+        <div className="portfolio-cards--card-content">
+          <h2 className="portfolio-cards--card-title">{props.title}</h2>
+          <p>{props.description}</p>
+          <button className="btn" onClick={openModal}>
+            Explore
+          </button>
+        </div>
+      </div>
+
+      <CSSTransition
+        in={isOpen}
+        nodeRef={nodeRef}
+        timeout={300}
+        unmountOnExit
+        classNames="animation"
+        // onEnter={() => setShowButton(false)}
+        // onExited={() => setShowButton(true)}
+      >
+        <div ref={nodeRef} id="modal" onClick={(e) => clickOutside(e)}>
+          <div id="modal-wrapper">
+            <i
+              className="fa-solid fa-xmark"
+              id="modal-close"
+              onClick={closeModal}
+            ></i>
+            <header id="modal-header">
+              <h1>{props.title}</h1>
+            </header>
+            <div id="modal-content">{props.modalContent}</div>
+          </div>
+        </div>
+      </CSSTransition>
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <>
+      <h1>Custom React card with modal</h1>
+      <div className="portfolio-cards--container">
+        <Card
+          id={uuidv4()}
+          title="Project 1"
+          description="This is the description"
+          imgUrl="https://picsum.photos/400/600"
+          modalContent={<ModalContent1 />}
+        />
+        <Card
+          id={uuidv4()}
+          title="Project 2"
+          description="This is the description"
+          imgUrl="https://picsum.photos/400/600"
+          modalContent={<ModalContent2 />}
+        />
+      </div>
+    </>
+    
+  );
+};
+
+const rootElement = document.getElementById("root");
+const root = createRoot(rootElement);
+
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+
