@@ -1,7 +1,8 @@
 // controllers/blogController.js
 const db = require("../Models/db");
-
-
+// const multer = require("multer");
+// const storage = multer.memoryStorage(); 
+// const upload = multer({ storage: storage });
 
 
 exports.getBlog = async (req, res) => {
@@ -32,14 +33,16 @@ exports.getBlogDetails = async (req, res) => {
 
 
 exports.postBlog = async (req, res) => {
-    const { title, city, details, authorname, image } = req.body;
+    const { title, city, details, authorname } = req.body;
+    // const imageBuffer = req.file.buffer;
+    // console.log(imageBuffer);
     // console.log(image);
     try {
         const query = `insert into blogs_table (title, city, details,authorname)
           values ($1, $2, $3, $4)
           returning id`;
 
-        const values = [title, city, details, authorname,];
+        const values = [title, city, details, authorname];
         const blog = await db.query(query, values);
         res.status(200).json({
             message: "Blog Added Successfully",

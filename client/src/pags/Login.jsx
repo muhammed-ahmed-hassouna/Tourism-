@@ -46,12 +46,18 @@ const Login = () => {
       console.log(formData);
       try {
         const response = await axios.post('http://localhost:5000/Login', formData);
+
+        // document.cookie = `userToken=${response.data.token}; expires=${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)}; path=/`;  
+
+        sessionStorage.setItem("userToken", response.data.token);
+
         history("/");
       } catch (error) {
         console.error('Error:', error);
       }
     }
   };
+
 
   return (
     <section class="bg-gray-50 dark:bg-gray-900">
@@ -63,7 +69,6 @@ const Login = () => {
             </h1>
             <form
               class="space-y-4 md:space-y-6"
-              action="#"
               onSubmit={handleSubmit}
             >
               <div>

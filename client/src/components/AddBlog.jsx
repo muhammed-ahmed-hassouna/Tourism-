@@ -5,7 +5,7 @@ import { useState } from "react";
 const AddBlog = () => {
 
 
-  const [image, setImage] = useState();
+  const [image_data, setImage] = useState();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -21,18 +21,37 @@ const AddBlog = () => {
       ...formData,
       [name]: value,
     });
+    console.log(formData);
   };
   const handleUploadImage = (event) => {
-    setImage(event.target.files[0])
+    const selectedImage = event.target.files[0];
+    if (selectedImage) {
+      const reader = new FileReader();
+      console.log(reader);
+      reader.onload = (e) => {
+        const base64 = e.target.result;
+        // base64String contains the Base64 representation of the image
+        console.log(base64);
+        setFormData({
+          ...formData,
+          image_data: base64,
+        });
+        console.log(formData)
+      };
+
+      reader.readAsDataURL(selectedImage);
+
+    }
+
   };
 
   async function handleSubmit(event) {
     event.preventDefault();
-    
-    console.log({...formData, image : image});
-    try {
 
-      const res = await axios.post(`http://localhost:5000/BlogPost`, {...formData, image : image});
+    // console.log({ ...formData, image_data: image_data });
+    try {
+      console.log(formData);
+      const res = await axios.post(`http://localhost:5000/BlogPost`,formData);
       console.log(res);
     } catch (error) {
       console.log(error)
@@ -115,6 +134,7 @@ const AddBlog = () => {
                 </label>
                 <input
                   name="image_data"
+
                   class="file:p-2.5 file:bg-gradient-to-r file:from-[#006f6f57] file:to-[#00249b5c] file:border-0 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                   aria-describedby="blog-image_help"
                   id="blogImage"

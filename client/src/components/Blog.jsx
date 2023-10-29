@@ -8,7 +8,11 @@ const Blog = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/blog/${id}`)
+      .get(`http://localhost:5000/blog/${id}`, {
+        headers: {
+          "authorization": sessionStorage.getItem("userToken")
+        }
+      })
       .then((response) => {
         // Handle the response data here
         setBlog(response.data);

@@ -1,5 +1,6 @@
 const db = require("../Models/db");
-
+const jwt = require("jsonwebtoken");
+require('dotenv').config();
 
 
 exports.registerUser = async (req, res) => {
@@ -31,19 +32,29 @@ exports.registerUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
+
     try {
-        const checkemail = `select user_id from user_table where email = $1`;
-        const checked = await db.query(checkemail, [email]);
+        const checkUser = `SELECT * FROM user_table WHERE email = $1 AND password = $2`;
 
-        const checkpass = `select user_id from user_table where password = $1`;
-        const checkedpass = await db.query(checkpass, [password]);
-        console.log();
+        const checked = await db.query(checkUser, [email, password]);
 
-        if (checked.rows.length === 0 || checkedpass.rows.length === 0) {
-            res.status(400).json({ error: "Invalid Email or Password" });
-        } else {
-            res.redirect("/");
+        if (!checked.rows.length) {
+            res.status(400).send({ message: "Email or password is invalid" });
         }
+
+        const payload = {
+            name: checked.rows[0].username,
+            user_id: checked.rows[0].user_id,
+            email: checked.rows[0].email
+        }
+        // console.log(checked);
+        // console.log(payload);
+
+        
+        const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: "7d" });
+
+        res.json({ "token": token });
+
     } catch (err) {
         console.error(err);
         res.status(500).send("Failed to Authenticate");
